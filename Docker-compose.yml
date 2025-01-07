@@ -1,0 +1,9 @@
+services:
+  conduit-pg:
+    image: bitnami/postgresql
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=conduit
+    ports:
+      - 5432:5432
