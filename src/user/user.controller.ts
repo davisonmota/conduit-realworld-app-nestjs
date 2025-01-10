@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Get,
-  Request,
   Post,
   UseGuards,
   ValidationPipe,
@@ -12,6 +11,8 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UserService } from './user.service'
 import { AuthGuard } from '../auth/guards/auth.guard'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { GetCurrentUser } from '../common/decorators/current-user.param.decorator'
+import { CurrentUserDto } from '../common/dto/current-user.dto'
 
 @Controller()
 export class UserController {
@@ -24,17 +25,17 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('user')
-  getCurrentUser(@Request() request: any) {
-    return this.userService.findOneById(request.user.sub)
+  getCurrentUser(@GetCurrentUser() currentUserDto: CurrentUserDto) {
+    return this.userService.findOneById(currentUserDto.id)
   }
 
   @UseGuards(AuthGuard)
   @Put('user')
   updateUser(
-    @Request() request,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
     @Body(new ValidationPipe({ whitelist: true }))
     updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.updateById(request.user.sub, updateUserDto)
+    return this.userService.updateById(currentUserDto.id, updateUserDto)
   }
 }
