@@ -5,9 +5,6 @@ import {
   IsString,
   IsUrl,
   ValidateNested,
-  ValidationArguments,
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
 } from 'class-validator'
 import { Type } from 'class-transformer'
 
