@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
+import { CurrentUserDto } from '../../common/current-user.dto'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +24,12 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: 'secret',
       })
-      request['user'] = payload
+      // { sub: user.id, email: user.email, username: user.username }
+      request['user'] = new CurrentUserDto({
+        id: payload.sub,
+        username: payload.username,
+        email: payload.email,
+      })
     } catch {
       throw new UnauthorizedException()
     }

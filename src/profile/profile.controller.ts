@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common'
 import { UsernameDto } from './dto/username.dto'
 import { ProfileService } from './profile.service'
-import { AuthGuard } from '../auth/auth.guard'
-import { OptionalAuthGuard } from '../auth/optional-auth.guard'
+import { AuthGuard } from '../auth/guards/auth.guard'
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
 
 @Controller('profiles')
 export class ProfileController {
