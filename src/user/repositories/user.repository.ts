@@ -15,7 +15,7 @@ export class UserRepository {
   }
 
   save(userEntity: User) {
-    this.usersTypeOrmRepository.save(userEntity)
+    return this.usersTypeOrmRepository.save(userEntity)
   }
 
   async findOneByUserName(username: string) {

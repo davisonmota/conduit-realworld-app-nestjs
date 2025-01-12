@@ -15,17 +15,13 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const userEmailExist = await this.userRepository.findOneByEmail(
-      createUserDto.user.email,
-    )
-    const userNameExits = await this.userRepository.findOneByUserName(
-      createUserDto.user.username,
-    )
-
+    const [userEmailExist, userNameExits] = await Promise.all([
+      this.userRepository.findOneByEmail(createUserDto.user.email),
+      this.userRepository.findOneByUserName(createUserDto.user.username),
+    ])
     if (userEmailExist) {
       throw new BadRequestException('Email already exists')
     }
-
     if (userNameExits) {
       throw new BadRequestException('Username already exists')
     }
@@ -36,9 +32,8 @@ export class UserService {
       //TODO: move salt env to envFile
       password: await bcrypt.hash(createUserDto.user.password, 10),
     })
-    this.userRepository.save(user)
-
-    return this.userMap(user)
+    const newUser = await this.userRepository.save(user)
+    return this.userMap(newUser)
   }
 
   async findOneByEmail(email: string) {
