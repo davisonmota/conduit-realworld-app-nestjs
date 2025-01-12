@@ -5,13 +5,14 @@ import {
   Post,
   UseGuards,
   ValidationPipe,
-  Request,
   Delete,
 } from '@nestjs/common'
 import { UsernameDto } from './dto/username.dto'
 import { ProfileService } from './profile.service'
 import { AuthGuard } from '../auth/guards/auth.guard'
 import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
+import { GetCurrentUser } from '../common/decorators/current-user.param.decorator'
+import { CurrentUserDto } from '../common/dto/current-user.dto'
 
 @Controller('profiles')
 export class ProfileController {
@@ -20,28 +21,27 @@ export class ProfileController {
   @UseGuards(OptionalAuthGuard)
   @Get(':username')
   getProfile(
-    @Request() req,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
     @Param(new ValidationPipe()) { username }: UsernameDto,
   ) {
-    const loggedUserUsername = req.user !== undefined ? req.user.username : null
-    return this.profileService.getProfile(loggedUserUsername, username)
+    return this.profileService.getProfile(currentUserDto.username, username)
   }
 
   @UseGuards(AuthGuard)
   @Post(':username/follow')
   followUser(
-    @Request() req,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
     @Param(new ValidationPipe()) { username }: UsernameDto,
   ) {
-    return this.profileService.follow(req.user.username, username)
+    return this.profileService.follow(currentUserDto.username, username)
   }
 
   @UseGuards(AuthGuard)
   @Delete(':username/follow')
   unfollowUser(
-    @Request() req,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
     @Param(new ValidationPipe()) { username }: UsernameDto,
   ) {
-    return this.profileService.unfollow(req.user.username, username)
+    return this.profileService.unfollow(currentUserDto.username, username)
   }
 }
