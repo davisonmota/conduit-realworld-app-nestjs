@@ -7,7 +7,7 @@ import { UserRepository } from './repositories/user.repository'
 import { Follow } from '../profile/entities/followers.entyty'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Follow])],
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [UserService, UserRepository],
   exports: [UserRepository],

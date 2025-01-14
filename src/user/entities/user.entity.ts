@@ -1,27 +1,10 @@
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm'
-import { randomUUID } from 'node:crypto'
+import { Column, Entity, OneToMany } from 'typeorm'
 import { Follow } from '../../profile/entities/followers.entyty'
-
-// TODO: create base entity
+import { BaseEntity } from '../../common/entities/base.entity'
+import { Article } from '../../article/entities/article.entity'
 
 @Entity({ name: 'users' })
-export class User {
-  constructor(data: Partial<User>) {
-    Object.assign(this, data)
-    this.id = this.id || randomUUID()
-  }
-
-  @PrimaryColumn({ type: 'uuid' })
-  id: string
-
+export class User extends BaseEntity<User> {
   @Column({ unique: true })
   username: string
 
@@ -43,19 +26,6 @@ export class User {
   @OneToMany(() => Follow, (follow) => follow.followed)
   followers: Follow[]
 
-  @Column({ type: 'timestamp' })
-  created_at: Date
-
-  @BeforeInsert()
-  beforeInsert() {
-    this.created_at = this.created_at || new Date()
-  }
-
-  @UpdateDateColumn()
-  updated_at: Date
-
-  @BeforeUpdate()
-  beforeUpdate() {
-    this.updated_at = new Date()
-  }
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[]
 }

@@ -5,6 +5,9 @@ import { User } from './user/entities/user.entity'
 import { AuthModule } from './auth/auth.module'
 import { Follow } from './profile/entities/followers.entyty'
 import { ProfileModule } from './profile/profile.module'
+import { ArticleModule } from './article/article.module'
+import { Article } from './article/entities/article.entity'
+import { Tag } from './article/entities/tag.entity'
 
 @Module({
   // TODO: move variables to envFile
@@ -16,12 +19,13 @@ import { ProfileModule } from './profile/profile.module'
       username: 'docker',
       password: 'docker',
       database: 'conduit',
-      entities: [User, Follow],
+      entities: [User, Follow, Article, Tag],
       synchronize: true,
     }),
     AuthModule,
     UserModule,
     ProfileModule,
+    ArticleModule,
   ],
   controllers: [],
   providers: [],
