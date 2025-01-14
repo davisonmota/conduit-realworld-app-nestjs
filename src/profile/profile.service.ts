@@ -22,6 +22,9 @@ export class ProfileService {
   }
 
   async follow(followerUsername: string, followedUsername: string) {
+    if (followerUsername === followedUsername) {
+      throw new BadRequestException("You can't follow yourself.")
+    }
     const { isFollowing, follower, followed } = await this.isFollowing(
       followerUsername,
       followedUsername,
@@ -34,6 +37,9 @@ export class ProfileService {
   }
 
   async unfollow(followerUsername: string, unfollowUsername: string) {
+    if (followerUsername === unfollowUsername) {
+      throw new BadRequestException("You can't unfollow yourself.")
+    }
     const {
       isFollowing,
       follower,
@@ -47,9 +53,6 @@ export class ProfileService {
   }
 
   async isFollowing(followerUsername: string, followedUsername: string) {
-    if (followerUsername === followedUsername) {
-      throw new BadRequestException("You can't follow yourself.")
-    }
     const [follower, followed] = await this.findUsersOrThrow(
       followerUsername,
       followedUsername,

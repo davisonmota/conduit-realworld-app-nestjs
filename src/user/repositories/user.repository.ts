@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from '../entities/user.entity'
-import { IsNull, Repository } from 'typeorm'
+import { FindOneOptions, IsNull, Repository } from 'typeorm'
 
 @Injectable()
 export class UserRepository {
@@ -30,6 +30,10 @@ export class UserRepository {
        * IsNull() resolver
        */
     })
+  }
+
+  async findOne(options: FindOneOptions<User>) {
+    return await this.usersTypeOrmRepository.findOne(options)
   }
 
   update(user: User) {

@@ -1,7 +1,6 @@
 import {
   BeforeInsert,
   BeforeUpdate,
-  Column,
   CreateDateColumn,
   PrimaryColumn,
   UpdateDateColumn,

@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreateArticleDto } from './dto/create-article.dto'
 import { ArticleRepository } from './repositories/article.repository'
 import { UserRepository } from '../user/repositories/user.repository'
@@ -10,11 +6,20 @@ import { Article } from './entities/article.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Tag } from './entities/tag.entity'
 import { Repository } from 'typeorm'
-import { ArticleResponse } from './entities/article-response.dto'
+import { ArticleResponse } from './dto/article-response.dto'
+import { ProfileService } from '../profile/profile.service'
+
+interface ArticleMapInput {
+  article: Article
+  following: boolean
+  favorited: boolean
+  favoritesCount?: number
+}
 
 @Injectable()
 export class ArticleService {
   constructor(
+    private readonly profileService: ProfileService,
     private readonly articleRepository: ArticleRepository,
     private readonly userRepository: UserRepository,
     @InjectRepository(Tag)
@@ -27,13 +32,11 @@ export class ArticleService {
       throw new NotFoundException('User not found')
     }
     const slug = this.generateSlug(articleDto.title)
-    const existsArticle = await this.articleRepository.findOne({
-      where: { slug, author },
+    const existsArticleWithSlug = await this.articleRepository.findOne({
+      where: { slug },
     })
-    if (existsArticle) {
-      throw new ConflictException(
-        'An article with this title already exists for the same author',
-      )
+    if (existsArticleWithSlug) {
+      //TODO implements role to builder unique slug
     }
 
     const newArticle = new Article({
@@ -60,7 +63,59 @@ export class ArticleService {
 
     const article = await this.articleRepository.create(newArticle)
 
-    return this.articleMap(article)
+    return this.articleMap({ article, following: false, favorited: false })
+  }
+
+  async favorite(userId: string, slug: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      relations: ['favorites'],
+    })
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    const article = await this.articleRepository.findOne({
+      where: { slug },
+      relations: ['author'],
+    })
+
+    if (!article) {
+      throw new NotFoundException('Article not found')
+    }
+
+    const { isFollowing } = await this.profileService.isFollowing(
+      user.username,
+      article.author.username,
+    )
+
+    const favoritesCount = await this.countFavorites(article.id)
+    if (
+      user.favorites.some((favoriteArticle) => favoriteArticle.slug === slug)
+    ) {
+      return this.articleMap({
+        article,
+        favorited: true,
+        following: isFollowing,
+        favoritesCount,
+      })
+    }
+
+    user.favorites.push(article)
+    await this.userRepository.save(user)
+
+    return this.articleMap({
+      article,
+      following: isFollowing,
+      favorited: true,
+      favoritesCount: favoritesCount + 1,
+    })
+  }
+
+  async countFavorites(articleId: string): Promise<number> {
+    return await this.articleRepository.countFavorites(articleId)
   }
 
   private generateSlug(title: string) {
@@ -73,10 +128,12 @@ export class ArticleService {
       .replace(/^-+|-+$/g, '')
   }
 
-  private articleMap(
-    article: Article,
-    following: boolean = false,
-  ): ArticleResponse {
+  private articleMap({
+    article,
+    following,
+    favorited,
+    favoritesCount,
+  }: ArticleMapInput): ArticleResponse {
     // TODO: create rules slug, favorited, favoritesCount, falowing
     return {
       article: {
@@ -87,8 +144,8 @@ export class ArticleService {
         createdAt: article.created_at,
         updatedAt: article.updated_at,
         tagList: article.tags ? article.tags.map((tag: Tag) => tag.tag) : [],
-        favorited: false,
-        favoritesCount: 0,
+        favoritesCount: favoritesCount || 0,
+        favorited: favorited || false,
         author: {
           username: article.author.username,
           bio: article.author.bio,

@@ -7,7 +7,7 @@ export class ArticleResponse {
     tagList?: Array<string>
     createdAt: Date
     updatedAt: Date
-    favorited: false
+    favorited: boolean
     favoritesCount: number
     author: {
       username: string

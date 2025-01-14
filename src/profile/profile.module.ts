@@ -10,5 +10,6 @@ import { FollowRepository } from './repositories/follow.repository'
   imports: [TypeOrmModule.forFeature([Follow]), UserModule],
   controllers: [ProfileController],
   providers: [ProfileService, FollowRepository],
+  exports: [ProfileService],
 })
 export class ProfileModule {}

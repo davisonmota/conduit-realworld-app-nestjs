@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany } from 'typeorm'
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
 import { Follow } from '../../profile/entities/followers.entyty'
 import { BaseEntity } from '../../common/entities/base.entity'
 import { Article } from '../../article/entities/article.entity'
@@ -28,4 +28,8 @@ export class User extends BaseEntity<User> {
 
   @OneToMany(() => Article, (article) => article.author)
   articles: Article[]
+
+  @ManyToMany(() => Article, (article) => article.favoritedBy)
+  @JoinTable()
+  favorites?: Article[]
 }

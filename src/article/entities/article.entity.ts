@@ -1,17 +1,10 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  Unique,
-} from 'typeorm'
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm'
 import { BaseEntity } from '../../common/entities/base.entity'
 import { User } from '../../user/entities/user.entity'
 import { Tag } from './tag.entity'
 
+//TODO corrigir: slug deve ser única para a tabela toda
 @Entity({ name: 'articles' })
-@Unique(['author', 'slug'])
 export class Article extends BaseEntity<Article> {
   @ManyToOne(() => User, (user) => user.articles, { nullable: false })
   author: User
@@ -19,7 +12,7 @@ export class Article extends BaseEntity<Article> {
   @Column({ type: 'text', nullable: false })
   title: string
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: false, unique: true })
   slug: string
 
   @Column({ type: 'text', nullable: false })
@@ -34,4 +27,7 @@ export class Article extends BaseEntity<Article> {
   })
   @JoinTable({ name: 'articles_tags' })
   tags?: Tag[]
+
+  @ManyToMany(() => User, (user) => user.favorites)
+  favoritedBy?: User[]
 }
