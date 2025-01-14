@@ -2,6 +2,7 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
+  CreateDateColumn,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm'
@@ -16,7 +17,7 @@ export abstract class BaseEntity<T> {
   @PrimaryColumn({ type: 'uuid' })
   id: string
 
-  @Column({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamp' })
   created_at: Date
 
   @BeforeInsert()

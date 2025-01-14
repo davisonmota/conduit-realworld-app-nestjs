@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { CreateArticleDto } from './dto/create-article.dto'
 import { ArticleRepository } from './repositories/article.repository'
 import { UserRepository } from '../user/repositories/user.repository'
@@ -20,12 +24,23 @@ export class ArticleService {
   async create(authorId: string, { article: articleDto }: CreateArticleDto) {
     const author = await this.userRepository.findOneById(authorId)
     if (!author) {
-      throw new NotFoundException('Author not found')
+      throw new NotFoundException('User not found')
     }
+    const slug = this.generateSlug(articleDto.title)
+    const existsArticle = await this.articleRepository.findOne({
+      where: { slug, author },
+    })
+    if (existsArticle) {
+      throw new ConflictException(
+        'An article with this title already exists for the same author',
+      )
+    }
+
     const newArticle = new Article({
       title: articleDto.title,
       description: articleDto.description,
       body: articleDto.body,
+      slug,
       author,
     })
 
@@ -48,6 +63,16 @@ export class ArticleService {
     return this.articleMap(article)
   }
 
+  private generateSlug(title: string) {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[\s_]+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
+
   private articleMap(
     article: Article,
     following: boolean = false,
@@ -58,7 +83,7 @@ export class ArticleService {
         title: article.title,
         description: article.description,
         body: article.body,
-        slug: 'slug',
+        slug: article.slug,
         createdAt: article.created_at,
         updatedAt: article.updated_at,
         tagList: article.tags ? article.tags.map((tag: Tag) => tag.tag) : [],

@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindOneOptions, Repository } from 'typeorm'
 import { Article } from '../entities/article.entity'
 import { Injectable } from '@nestjs/common'
 
@@ -12,5 +12,9 @@ export class ArticleRepository {
 
   async create(article: Article) {
     return await this.articlesTypeOrmRepository.save(article)
+  }
+
+  async findOne(options: FindOneOptions<Article>) {
+    return await this.articlesTypeOrmRepository.findOne(options)
   }
 }
