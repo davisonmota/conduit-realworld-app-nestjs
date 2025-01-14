@@ -4,7 +4,6 @@ import { UserService } from './user.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from './entities/user.entity'
 import { UserRepository } from './repositories/user.repository'
-import { Follow } from '../profile/entities/followers.entyty'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
