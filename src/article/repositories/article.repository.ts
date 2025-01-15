@@ -33,4 +33,8 @@ export class ArticleRepository {
   async save(updatedArticle: Article) {
     return this.articlesTypeOrmRepository.save(updatedArticle)
   }
+
+  async delete(article: Article) {
+    await this.articlesTypeOrmRepository.delete({ id: article.id })
+  }
 }

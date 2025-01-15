@@ -42,6 +42,15 @@ export class ArticleController {
   }
 
   @UseGuards(AuthGuard)
+  @Delete(':slug')
+  deleteArticle(
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+    @Param() { slug }: ParamSlugDto,
+  ) {
+    return this.articleService.delete(currentUserDto, slug)
+  }
+
+  @UseGuards(AuthGuard)
   @Post(':slug/favorite')
   favoriteArticle(
     @Param() { slug }: ParamSlugDto,

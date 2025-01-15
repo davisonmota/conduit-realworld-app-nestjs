@@ -98,6 +98,21 @@ export class ArticleService {
     })
   }
 
+  async delete(currentUserDto: CurrentUserDto, slug: string) {
+    const article = await this.articleRepository.findOne({
+      where: { slug },
+      relations: ['author'],
+    })
+    if (!article) {
+      throw new NotFoundException('Article not found')
+    }
+    if (article.author.username !== currentUserDto.username) {
+      throw new ForbiddenException()
+    }
+
+    await this.articleRepository.delete(article)
+  }
+
   async favorite(userId: string, slug: string) {
     const user = await this.userRepository.findOne({
       where: {
