@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { CreateArticleDto } from './dto/create-article.dto'
 import { ArticleRepository } from './repositories/article.repository'
 import { UserRepository } from '../user/repositories/user.repository'
@@ -9,6 +13,8 @@ import { Repository } from 'typeorm'
 import { ArticleResponse } from './dto/article-response.dto'
 import { ProfileService } from '../profile/profile.service'
 import { randomUUID } from 'node:crypto'
+import { UpdateArticleDto } from './dto/update-article.dto'
+import { CurrentUserDto } from '../common/dto/current-user.dto'
 
 interface ArticleMapInput {
   article: Article
@@ -42,22 +48,45 @@ export class ArticleService {
     })
 
     if (articleDto.tagList) {
-      newArticle.tags = await Promise.all(
-        articleDto.tagList.map(async (tagName: string) => {
-          let tag = await this.tagTypeOrmRepository.findOne({
-            where: { tag: tagName },
-          })
-          if (!tag) {
-            tag = this.tagTypeOrmRepository.create({ tag: tagName })
-          }
-          return tag
-        }),
-      )
+      newArticle.tags = await this.createTags(articleDto.tagList)
     }
-
     const article = await this.articleRepository.create(newArticle)
-
     return this.articleMap({ article, following: false, favorited: false })
+  }
+
+  async update(
+    currentUser: CurrentUserDto,
+    slug: string,
+    { article: articleDto }: UpdateArticleDto,
+  ) {
+    const article = await this.articleRepository.findOne({
+      where: { slug },
+      relations: ['author'],
+    })
+    if (!article) {
+      throw new NotFoundException('Article not found')
+    }
+    if (article.author.username !== currentUser.username) {
+      throw new ForbiddenException()
+    }
+    const updatedArticle = new Article({
+      title: articleDto.title || article.title,
+      slug: articleDto.title
+        ? await this.generateSlug(articleDto.title)
+        : article.slug,
+      description: articleDto.description || article.description,
+      body: articleDto.body || article.body,
+      author: article.author,
+    })
+    if (articleDto.tagList) {
+      updatedArticle.tags = await this.createTags(articleDto.tagList)
+    }
+    await this.articleRepository.save(updatedArticle)
+    return this.articleMap({
+      article: updatedArticle,
+      following: false,
+      favorited: await this.isFavorited(currentUser.id, slug),
+    })
   }
 
   async favorite(userId: string, slug: string) {
@@ -112,6 +141,34 @@ export class ArticleService {
     return await this.articleRepository.countFavorites(articleId)
   }
 
+  private async createTags(tagList: Array<string>) {
+    return await Promise.all(
+      tagList.map(async (tagName: string) => {
+        let tag = await this.tagTypeOrmRepository.findOne({
+          where: { tag: tagName },
+        })
+        if (!tag) {
+          tag = this.tagTypeOrmRepository.create({ tag: tagName })
+        }
+        return tag
+      }),
+    )
+  }
+
+  async isFavorited(userId: string, slugArticle: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favorites'],
+    })
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    return user.favorites.some(
+      (favoriteArticle) => favoriteArticle.slug === slugArticle,
+    )
+  }
+
   private async generateSlug(title: string) {
     const slug = title
       .toLowerCase()
@@ -136,7 +193,6 @@ export class ArticleService {
     favorited,
     favoritesCount,
   }: ArticleMapInput): ArticleResponse {
-    // TODO: create rules slug, favorited, favoritesCount, falowing
     return {
       article: {
         title: article.title,
@@ -146,8 +202,8 @@ export class ArticleService {
         createdAt: article.created_at,
         updatedAt: article.updated_at,
         tagList: article.tags ? article.tags.map((tag: Tag) => tag.tag) : [],
-        favoritesCount: favoritesCount || 0,
-        favorited: favorited || false,
+        favoritesCount: favoritesCount,
+        favorited: favorited,
         author: {
           username: article.author.username,
           bio: article.author.bio,

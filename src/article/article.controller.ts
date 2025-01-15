@@ -3,6 +3,7 @@ import {
   Controller,
   Param,
   Post,
+  Put,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common'
@@ -12,6 +13,7 @@ import { CreateArticleDto } from './dto/create-article.dto'
 import { GetCurrentUser } from '../common/decorators/current-user.param.decorator'
 import { CurrentUserDto } from '../common/dto/current-user.dto'
 import { ParamSlugDto } from './dto/param-slug.dto'
+import { UpdateArticleDto } from './dto/update-article.dto'
 
 @Controller('articles')
 export class ArticleController {
@@ -25,6 +27,17 @@ export class ArticleController {
     createArticleDto: CreateArticleDto,
   ) {
     return this.articleService.create(author.id, createArticleDto)
+  }
+
+  @UseGuards(AuthGuard)
+  @Put(':slug')
+  updateArticle(
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+    @Param() { slug }: ParamSlugDto,
+    @Body(new ValidationPipe({ whitelist: true }))
+    updateArticleDto: UpdateArticleDto,
+  ) {
+    return this.articleService.update(currentUserDto, slug, updateArticleDto)
   }
 
   @UseGuards(AuthGuard)

@@ -29,4 +29,8 @@ export class ArticleRepository {
       })
       .getCount()
   }
+
+  async save(updatedArticle: Article) {
+    return this.articlesTypeOrmRepository.save(updatedArticle)
+  }
 }
