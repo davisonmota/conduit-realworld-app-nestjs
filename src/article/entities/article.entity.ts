@@ -3,7 +3,6 @@ import { BaseEntity } from '../../common/entities/base.entity'
 import { User } from '../../user/entities/user.entity'
 import { Tag } from './tag.entity'
 
-//TODO corrigir: slug deve ser única para a tabela toda
 @Entity({ name: 'articles' })
 export class Article extends BaseEntity<Article> {
   @ManyToOne(() => User, (user) => user.articles, { nullable: false })
@@ -28,6 +27,6 @@ export class Article extends BaseEntity<Article> {
   @JoinTable({ name: 'articles_tags' })
   tags?: Tag[]
 
-  @ManyToMany(() => User, (user) => user.favorites)
+  @ManyToMany(() => User, (user) => user.favorites, { onDelete: 'CASCADE' })
   favoritedBy?: User[]
 }

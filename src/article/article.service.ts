@@ -8,6 +8,7 @@ import { Tag } from './entities/tag.entity'
 import { Repository } from 'typeorm'
 import { ArticleResponse } from './dto/article-response.dto'
 import { ProfileService } from '../profile/profile.service'
+import { randomUUID } from 'node:crypto'
 
 interface ArticleMapInput {
   article: Article
@@ -31,14 +32,7 @@ export class ArticleService {
     if (!author) {
       throw new NotFoundException('User not found')
     }
-    const slug = this.generateSlug(articleDto.title)
-    const existsArticleWithSlug = await this.articleRepository.findOne({
-      where: { slug },
-    })
-    if (existsArticleWithSlug) {
-      //TODO implements role to builder unique slug
-    }
-
+    const slug = await this.generateSlug(articleDto.title)
     const newArticle = new Article({
       title: articleDto.title,
       description: articleDto.description,
@@ -118,14 +112,22 @@ export class ArticleService {
     return await this.articleRepository.countFavorites(articleId)
   }
 
-  private generateSlug(title: string) {
-    return title
+  private async generateSlug(title: string) {
+    const slug = title
       .toLowerCase()
       .trim()
       .replace(/[\s_]+/g, '-')
       .replace(/[^\w-]+/g, '')
       .replace(/-+/g, '-')
       .replace(/^-+|-+$/g, '')
+
+    const existsArticleWithSlug = await this.articleRepository.findOne({
+      where: { slug },
+    })
+    if (!existsArticleWithSlug) {
+      return slug
+    }
+    return slug.concat('-', randomUUID().slice(0, 8))
   }
 
   private articleMap({
