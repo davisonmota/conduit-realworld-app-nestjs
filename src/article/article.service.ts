@@ -20,7 +20,7 @@ interface ArticleMapInput {
   article: Article
   following: boolean
   favorited: boolean
-  favoritesCount?: number
+  favoritesCount: number
 }
 
 @Injectable()
@@ -51,7 +51,12 @@ export class ArticleService {
       newArticle.tags = await this.createTags(articleDto.tagList)
     }
     const article = await this.articleRepository.create(newArticle)
-    return this.articleMap({ article, following: false, favorited: false })
+    return this.articleMap({
+      article,
+      following: false,
+      favorited: false,
+      favoritesCount: 0,
+    })
   }
 
   async update(
@@ -86,6 +91,7 @@ export class ArticleService {
       article: updatedArticle,
       following: false,
       favorited: await this.isFavorited(currentUser.id, slug),
+      favoritesCount: await this.countFavorites(updatedArticle.id),
     })
   }
 
@@ -202,8 +208,8 @@ export class ArticleService {
         createdAt: article.created_at,
         updatedAt: article.updated_at,
         tagList: article.tags ? article.tags.map((tag: Tag) => tag.tag) : [],
-        favoritesCount: favoritesCount,
-        favorited: favorited,
+        favoritesCount,
+        favorited,
         author: {
           username: article.author.username,
           bio: article.author.bio,
