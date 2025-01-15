@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -87,10 +88,12 @@ export class ArticleService {
       updatedArticle.tags = await this.createTags(articleDto.tagList)
     }
     await this.articleRepository.save(updatedArticle)
+
+    const { isFavorited } = await this.isFavorited(currentUser.id, slug)
     return this.articleMap({
       article: updatedArticle,
       following: false,
-      favorited: await this.isFavorited(currentUser.id, slug),
+      favorited: isFavorited,
       favoritesCount: await this.countFavorites(updatedArticle.id),
     })
   }
@@ -143,6 +146,36 @@ export class ArticleService {
     })
   }
 
+  async unfavorite(userId: string, slug: string) {
+    const { isFavorited, user } = await this.isFavorited(userId, slug)
+    if (!isFavorited) {
+      throw new BadRequestException(
+        'User has not added this article to favorites',
+      )
+    }
+    user.favorites = user.favorites.filter(
+      (favoriteArticle) => favoriteArticle.slug !== slug,
+    )
+    await this.userRepository.save(user)
+
+    const article = await this.articleRepository.findOne({
+      where: { slug },
+      relations: ['author'],
+    })
+
+    const { isFollowing } = await this.profileService.isFollowing(
+      user.username,
+      article.author.username,
+    )
+
+    return this.articleMap({
+      article,
+      favorited: false,
+      following: isFollowing,
+      favoritesCount: await this.countFavorites(article.id),
+    })
+  }
+
   async countFavorites(articleId: string): Promise<number> {
     return await this.articleRepository.countFavorites(articleId)
   }
@@ -161,7 +194,7 @@ export class ArticleService {
     )
   }
 
-  async isFavorited(userId: string, slugArticle: string): Promise<boolean> {
+  async isFavorited(userId: string, slugArticle: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['favorites'],
@@ -169,10 +202,11 @@ export class ArticleService {
     if (!user) {
       throw new NotFoundException('User not found')
     }
-
-    return user.favorites.some(
+    const isFavorited = user.favorites.some(
       (favoriteArticle) => favoriteArticle.slug === slugArticle,
     )
+
+    return { isFavorited, user }
   }
 
   private async generateSlug(title: string) {

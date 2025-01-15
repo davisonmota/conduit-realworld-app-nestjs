@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Param,
   Post,
   Put,
@@ -47,5 +48,14 @@ export class ArticleController {
     @GetCurrentUser() currentUserDto: CurrentUserDto,
   ) {
     return this.articleService.favorite(currentUserDto.id, slug)
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':slug/favorite')
+  unfavoriteArticle(
+    @Param() { slug }: ParamSlugDto,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+  ) {
+    return this.articleService.unfavorite(currentUserDto.id, slug)
   }
 }
