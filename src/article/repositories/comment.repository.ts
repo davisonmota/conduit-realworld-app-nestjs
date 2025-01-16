@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindOneOptions, Repository } from 'typeorm'
 import { Injectable } from '@nestjs/common'
 import { Comment } from '../entities/comment.entity'
 
@@ -16,5 +16,9 @@ export class CommentRepository {
 
   async delete(commentId: string): Promise<void> {
     await this.commentRepository.delete({ id: commentId })
+  }
+
+  findOne(options: FindOneOptions<Comment>) {
+    return this.commentRepository.findOne(options)
   }
 }

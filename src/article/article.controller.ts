@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   UseGuards,
@@ -82,5 +83,14 @@ export class ArticleController {
       slug,
       createCommentDto,
     )
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/comments/:id')
+  deleteComment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+  ) {
+    return this.articleService.deleteComment(currentUserDto, id)
   }
 }

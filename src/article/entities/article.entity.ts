@@ -40,7 +40,6 @@ export class Article extends BaseEntity<Article> {
 
   @OneToMany(() => Comment, (comment) => comment.article, {
     cascade: true,
-    onDelete: 'CASCADE',
   })
   comments?: Comment[]
 }

@@ -36,7 +36,6 @@ export class User extends BaseEntity<User> {
 
   @OneToMany(() => Comment, (comment) => comment.author, {
     cascade: true,
-    onDelete: 'CASCADE',
   })
   comments?: Comment[]
 }

@@ -225,6 +225,21 @@ export class ArticleService {
     return this.commentMap({ comment, following: false })
   }
 
+  async deleteComment(currentUserDto: CurrentUserDto, id: string) {
+    const comment = await this.commentRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    })
+    if (!comment) {
+      throw new NotFoundException('Comment not found')
+    }
+    if (comment.author.username !== currentUserDto.username) {
+      throw new ForbiddenException()
+    }
+
+    await this.commentRepository.delete(comment.id)
+  }
+
   async countFavorites(articleId: string): Promise<number> {
     return await this.articleRepository.countFavorites(articleId)
   }

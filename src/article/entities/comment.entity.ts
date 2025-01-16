@@ -8,11 +8,15 @@ export class Comment extends BaseEntity<Comment> {
   @Column({ type: 'text', nullable: false })
   body: string
 
-  @ManyToOne(() => Article, (article) => article.comments, { nullable: false })
+  @ManyToOne(() => Article, (article) => article.comments, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   article: Article
 
   @ManyToOne(() => User, (author) => author.comments, {
     nullable: false,
+    onDelete: 'CASCADE',
   })
   author: User
 }
