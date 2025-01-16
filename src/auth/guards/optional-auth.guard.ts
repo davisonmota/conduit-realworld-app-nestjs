@@ -16,6 +16,11 @@ export class OptionalAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const token = this.extractTokenFromHeader(request)
     if (!token) {
+      request['user'] = new CurrentUserDto({
+        id: null,
+        username: null,
+        email: null,
+      })
       return true
     }
 
