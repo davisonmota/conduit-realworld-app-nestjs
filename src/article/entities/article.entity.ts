@@ -1,7 +1,15 @@
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm'
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm'
 import { BaseEntity } from '../../common/entities/base.entity'
 import { User } from '../../user/entities/user.entity'
 import { Tag } from './tag.entity'
+import { Comment } from './comment.entity'
 
 @Entity({ name: 'articles' })
 export class Article extends BaseEntity<Article> {
@@ -29,4 +37,10 @@ export class Article extends BaseEntity<Article> {
 
   @ManyToMany(() => User, (user) => user.favorites, { onDelete: 'CASCADE' })
   favoritedBy?: User[]
+
+  @OneToMany(() => Comment, (comment) => comment.article, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  comments?: Comment[]
 }

@@ -8,6 +8,7 @@ import { ProfileModule } from './profile/profile.module'
 import { ArticleModule } from './article/article.module'
 import { Article } from './article/entities/article.entity'
 import { Tag } from './article/entities/tag.entity'
+import { Comment } from './article/entities/comment.entity'
 
 @Module({
   // TODO: move variables to envFile
@@ -19,7 +20,7 @@ import { Tag } from './article/entities/tag.entity'
       username: 'docker',
       password: 'docker',
       database: 'conduit',
-      entities: [User, Follow, Article, Tag],
+      entities: [User, Follow, Article, Tag, Comment],
       synchronize: true,
     }),
     AuthModule,

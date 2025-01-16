@@ -8,14 +8,16 @@ import { Tag } from './entities/tag.entity'
 import { UserModule } from '../user/user.module'
 import { ProfileModule } from '../profile/profile.module'
 import { User } from '../user/entities/user.entity'
+import { Comment } from './entities/comment.entity'
+import { CommentRepository } from './repositories/comment.repository'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Article, Tag, User]),
+    TypeOrmModule.forFeature([Article, Tag, User, Comment]),
     UserModule,
     ProfileModule,
   ],
   controllers: [ArticleController],
-  providers: [ArticleService, ArticleRepository],
+  providers: [ArticleService, ArticleRepository, CommentRepository],
 })
 export class ArticleModule {}

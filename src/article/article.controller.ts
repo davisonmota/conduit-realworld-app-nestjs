@@ -15,6 +15,7 @@ import { GetCurrentUser } from '../common/decorators/current-user.param.decorato
 import { CurrentUserDto } from '../common/dto/current-user.dto'
 import { ParamSlugDto } from './dto/param-slug.dto'
 import { UpdateArticleDto } from './dto/update-article.dto'
+import { CreateCommentDto } from './dto/create-comment.dto'
 
 @Controller('articles')
 export class ArticleController {
@@ -66,5 +67,20 @@ export class ArticleController {
     @GetCurrentUser() currentUserDto: CurrentUserDto,
   ) {
     return this.articleService.unfavorite(currentUserDto.id, slug)
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':slug/comments')
+  createComment(
+    @Param() { slug }: ParamSlugDto,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+    @Body(new ValidationPipe({ whitelist: true }))
+    createCommentDto: CreateCommentDto,
+  ) {
+    return this.articleService.addComment(
+      currentUserDto,
+      slug,
+      createCommentDto,
+    )
   }
 }

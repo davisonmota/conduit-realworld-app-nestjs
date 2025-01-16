@@ -16,6 +16,10 @@ import { ProfileService } from '../profile/profile.service'
 import { randomUUID } from 'node:crypto'
 import { UpdateArticleDto } from './dto/update-article.dto'
 import { CurrentUserDto } from '../common/dto/current-user.dto'
+import { CreateCommentDto } from './dto/create-comment.dto'
+import { Comment } from './entities/comment.entity'
+import { CommentRepository } from './repositories/comment.repository'
+import { CommentResponse } from './dto/comment-response.dto'
 
 interface ArticleMapInput {
   article: Article
@@ -24,12 +28,18 @@ interface ArticleMapInput {
   favoritesCount: number
 }
 
+interface CommentMapInput {
+  comment: Comment
+  following: boolean
+}
+
 @Injectable()
 export class ArticleService {
   constructor(
     private readonly profileService: ProfileService,
     private readonly articleRepository: ArticleRepository,
     private readonly userRepository: UserRepository,
+    private readonly commentRepository: CommentRepository,
     @InjectRepository(Tag)
     private readonly tagTypeOrmRepository: Repository<Tag>,
   ) {}
@@ -191,6 +201,30 @@ export class ArticleService {
     })
   }
 
+  async addComment(
+    currentUserDto: CurrentUserDto,
+    slug: string,
+    createCommentDto: CreateCommentDto,
+  ) {
+    const author = await this.userRepository.findOne({
+      where: { id: currentUserDto.id },
+    })
+    if (!author) {
+      throw new NotFoundException('User not found')
+    }
+    const article = await this.articleRepository.findOne({ where: { slug } })
+    if (!article) {
+      throw new NotFoundException('Article not found')
+    }
+    const comment = new Comment({
+      body: createCommentDto.comment.body,
+      author,
+      article,
+    })
+    await this.commentRepository.save(comment)
+    return this.commentMap({ comment, following: false })
+  }
+
   async countFavorites(articleId: string): Promise<number> {
     return await this.articleRepository.countFavorites(articleId)
   }
@@ -263,6 +297,23 @@ export class ArticleService {
           username: article.author.username,
           bio: article.author.bio,
           image: article.author.image,
+          following,
+        },
+      },
+    }
+  }
+
+  private commentMap({ comment, following }: CommentMapInput): CommentResponse {
+    return {
+      comment: {
+        id: comment.id,
+        createdAt: comment.created_at,
+        updatedAt: comment.updated_at,
+        body: comment.body,
+        author: {
+          username: comment.author.username,
+          bio: comment.author.bio,
+          image: comment.author.image,
           following,
         },
       },
