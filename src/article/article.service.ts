@@ -44,6 +44,37 @@ export class ArticleService {
     private readonly tagTypeOrmRepository: Repository<Tag>,
   ) {}
 
+  async getArticle(currentUserDto: CurrentUserDto, slug: string) {
+    const article = await this.articleRepository.findOne({
+      where: { slug },
+      relations: ['author'],
+    })
+    if (!article) {
+      throw new NotFoundException(`Article not found`)
+    }
+    if (currentUserDto.username === null) {
+      return this.articleMap({
+        article,
+        favorited: false,
+        following: false,
+        favoritesCount: await this.countFavorites(article.id),
+      })
+    }
+    const [favorite, following] = await Promise.all([
+      await this.isFavorited(currentUserDto.id, slug),
+      await this.profileService.isFollowing(
+        currentUserDto.username,
+        article.author.username,
+      ),
+    ])
+    return this.articleMap({
+      article,
+      favorited: favorite.isFavorited,
+      following: following.isFollowing,
+      favoritesCount: await this.countFavorites(article.id),
+    })
+  }
+
   async create(authorId: string, { article: articleDto }: CreateArticleDto) {
     const author = await this.userRepository.findOneById(authorId)
     if (!author) {

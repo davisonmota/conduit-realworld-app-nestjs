@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   ParseUUIDPipe,
   Post,
@@ -17,6 +18,7 @@ import { CurrentUserDto } from '../common/dto/current-user.dto'
 import { ParamSlugDto } from './dto/param-slug.dto'
 import { UpdateArticleDto } from './dto/update-article.dto'
 import { CreateCommentDto } from './dto/create-comment.dto'
+import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
 
 @Controller('articles')
 export class ArticleController {
@@ -68,6 +70,15 @@ export class ArticleController {
     @GetCurrentUser() currentUserDto: CurrentUserDto,
   ) {
     return this.articleService.unfavorite(currentUserDto.id, slug)
+  }
+
+  @UseGuards(OptionalAuthGuard)
+  @Get(':slug')
+  getArticle(
+    @Param() { slug }: ParamSlugDto,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+  ) {
+    return this.articleService.getArticle(currentUserDto, slug)
   }
 
   @UseGuards(AuthGuard)
