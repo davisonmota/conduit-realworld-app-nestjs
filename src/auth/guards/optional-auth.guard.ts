@@ -19,7 +19,6 @@ export class OptionalAuthGuard implements CanActivate {
       request['user'] = new CurrentUserDto({
         id: null,
         username: null,
-        email: null,
       })
       return true
     }
@@ -32,7 +31,6 @@ export class OptionalAuthGuard implements CanActivate {
       request['user'] = new CurrentUserDto({
         id: payload.sub,
         username: payload.username,
-        email: payload.email,
       })
     } catch {
       throw new UnauthorizedException()

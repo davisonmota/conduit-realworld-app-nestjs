@@ -36,12 +36,6 @@ export class UserService {
     return this.userMap(newUser)
   }
 
-  async findOneByEmail(email: string) {
-    const user = await this.userRepository.findOneByEmail(email)
-    this.thrownExceptionIfUserNotFound(user)
-    return this.userMap(user)
-  }
-
   async findOneById(id: string) {
     const user = await this.userRepository.findOneById(id)
     this.thrownExceptionIfUserNotFound(user)
