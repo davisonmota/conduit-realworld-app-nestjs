@@ -8,7 +8,6 @@ export const GetCurrentUser = createParamDecorator(
     return new CurrentUserDto({
       id: user.id,
       username: user.username,
-      email: user.email,
     })
   },
 )
