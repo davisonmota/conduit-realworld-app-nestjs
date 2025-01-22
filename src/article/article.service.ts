@@ -20,6 +20,11 @@ import { CreateCommentDto } from './dto/create-comment.dto'
 import { Comment } from './entities/comment.entity'
 import { CommentRepository } from './repositories/comment.repository'
 import { CommentResponse } from './dto/comment-response.dto'
+import { ListArticlesDto } from './dto/list-articles.dto'
+import {
+  MultipleArticles,
+  MultipleArticlesDto,
+} from './dto/multiple.articles.dto'
 
 interface ArticleMapInput {
   article: Article
@@ -72,6 +77,17 @@ export class ArticleService {
       favorited: favorite.isFavorited,
       following: following.isFollowing,
       favoritesCount: await this.countFavorites(article.id),
+    })
+  }
+
+  async findAll(currentUserDto: CurrentUserDto, query: ListArticlesDto) {
+    const { articles, articlesCount } =
+      await this.articleRepository.findAll(query)
+
+    return this.multipleArticlesMap({
+      articles,
+      articlesCount,
+      currentUser: currentUserDto,
     })
   }
 
@@ -363,6 +379,59 @@ export class ArticleService {
           following,
         },
       },
+    }
+  }
+
+  private async multipleArticlesMap({
+    articles,
+    articlesCount,
+    currentUser,
+  }: {
+    articles: Article[]
+    articlesCount: number
+    currentUser: CurrentUserDto
+  }): Promise<MultipleArticlesDto> {
+    const multipleArticlesDto = await Promise.all(
+      articles.map(async (article): Promise<MultipleArticles> => {
+        let favorited = false
+        let following = false
+
+        if (currentUser.id) {
+          const { isFavorited } = await this.isFavorited(
+            currentUser.id,
+            article.slug,
+          )
+          favorited = isFavorited
+
+          const { isFollowing } = await this.profileService.isFollowing(
+            currentUser.username,
+            article.author.username,
+          )
+          following = isFollowing
+        }
+
+        return {
+          slug: article.slug,
+          title: article.title,
+          description: article.description,
+          createdAt: article.created_at,
+          updatedAt: article.updated_at,
+          tagList: article.tags.map((tags) => tags.tag),
+          favoritesCount: await this.countFavorites(article.id),
+          favorited,
+          author: {
+            username: article.author.username,
+            bio: article.author.bio,
+            image: article.author.image,
+            following,
+          },
+        }
+      }),
+    )
+
+    return {
+      articles: multipleArticlesDto,
+      articlesCount,
     }
   }
 }

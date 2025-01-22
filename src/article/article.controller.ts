@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common'
@@ -19,6 +20,7 @@ import { ParamSlugDto } from './dto/param-slug.dto'
 import { UpdateArticleDto } from './dto/update-article.dto'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
+import { ListArticlesDto } from './dto/list-articles.dto'
 
 @Controller('articles')
 export class ArticleController {
@@ -32,6 +34,15 @@ export class ArticleController {
     createArticleDto: CreateArticleDto,
   ) {
     return this.articleService.create(author.id, createArticleDto)
+  }
+
+  @UseGuards(OptionalAuthGuard)
+  @Get()
+  listArticle(
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+    @Query() query: ListArticlesDto,
+  ) {
+    return this.articleService.findAll(currentUserDto, query)
   }
 
   @UseGuards(AuthGuard)
