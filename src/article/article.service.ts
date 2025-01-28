@@ -20,11 +20,12 @@ import { CreateCommentDto } from './dto/create-comment.dto'
 import { Comment } from './entities/comment.entity'
 import { CommentRepository } from './repositories/comment.repository'
 import { CommentResponse } from './dto/comment-response.dto'
-import { ListArticlesDto } from './dto/list-articles.dto'
+import { ListArticlesQueryDto } from './dto/list-articles.query.dto'
 import {
   MultipleArticles,
   MultipleArticlesDto,
 } from './dto/multiple.articles.dto'
+import { FeedQueryDto } from './dto/feed.query.dto'
 
 interface ArticleMapInput {
   article: Article
@@ -48,6 +49,18 @@ export class ArticleService {
     @InjectRepository(Tag)
     private readonly tagTypeOrmRepository: Repository<Tag>,
   ) {}
+
+  async feed(currentUserDto: CurrentUserDto, query: FeedQueryDto) {
+    const { articles, articlesCount } = await this.articleRepository.findFeed(
+      currentUserDto.id,
+      query,
+    )
+
+    return {
+      articles,
+      articlesCount,
+    }
+  }
 
   async getArticle(currentUserDto: CurrentUserDto, slug: string) {
     const article = await this.articleRepository.findOne({
@@ -80,7 +93,7 @@ export class ArticleService {
     })
   }
 
-  async findAll(currentUserDto: CurrentUserDto, query: ListArticlesDto) {
+  async findAll(currentUserDto: CurrentUserDto, query: ListArticlesQueryDto) {
     const { articles, articlesCount } =
       await this.articleRepository.findAll(query)
 

@@ -3,7 +3,8 @@ import { FindOneOptions, Repository } from 'typeorm'
 import { Article } from '../entities/article.entity'
 import { Injectable } from '@nestjs/common'
 import { User } from '../../user/entities/user.entity'
-import { ListArticlesDto } from '../dto/list-articles.dto'
+import { ListArticlesQueryDto } from '../dto/list-articles.query.dto'
+import { FeedQueryDto } from '../dto/feed.query.dto'
 
 @Injectable()
 export class ArticleRepository {
@@ -39,7 +40,13 @@ export class ArticleRepository {
     await this.articlesTypeOrmRepository.delete({ id: article.id })
   }
 
-  async findAll({ tag, author, favorited, limit, offset }: ListArticlesDto) {
+  async findAll({
+    tag,
+    author,
+    favorited,
+    limit = 20,
+    offset = 0,
+  }: ListArticlesQueryDto) {
     const qb = this.articlesTypeOrmRepository.createQueryBuilder('article')
 
     qb.leftJoinAndSelect('article.author', 'author')
@@ -64,6 +71,32 @@ export class ArticleRepository {
 
     const [articles, articlesCount] = await qb.getManyAndCount()
 
+    return {
+      articles,
+      articlesCount,
+    }
+  }
+
+  async findFeed(
+    currentUserId: string,
+    { limit = 20, offset = 0 }: FeedQueryDto,
+  ) {
+    const qb = this.articlesTypeOrmRepository.createQueryBuilder('article')
+    qb.leftJoinAndSelect('article.author', 'author')
+    qb.leftJoinAndSelect('article.tags', 'tags')
+
+    qb.innerJoin(
+      'followers',
+      'followers',
+      'followers.followerId = :currentUserId AND followers.followedId = article.authorId',
+      { currentUserId },
+    )
+
+    qb.orderBy('article.created_at', 'DESC')
+
+    qb.skip(offset).take(limit)
+
+    const [articles, articlesCount] = await qb.getManyAndCount()
     return {
       articles,
       articlesCount,

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional, Min } from 'class-validator'
 
-export class ListArticlesDto {
+export class ListArticlesQueryDto {
   @IsOptional()
   @IsNotEmpty()
   tag?: string
@@ -16,10 +16,10 @@ export class ListArticlesDto {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  limit: number = 20
+  limit: number
 
   @IsOptional()
   @IsNumber()
   @Min(0)
-  offset: number = 0
+  offset: number
 }

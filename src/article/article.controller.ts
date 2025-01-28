@@ -20,7 +20,8 @@ import { ParamSlugDto } from './dto/param-slug.dto'
 import { UpdateArticleDto } from './dto/update-article.dto'
 import { CreateCommentDto } from './dto/create-comment.dto'
 import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
-import { ListArticlesDto } from './dto/list-articles.dto'
+import { ListArticlesQueryDto } from './dto/list-articles.query.dto'
+import { FeedQueryDto } from './dto/feed.query.dto'
 
 @Controller('articles')
 export class ArticleController {
@@ -40,9 +41,18 @@ export class ArticleController {
   @Get()
   listArticle(
     @GetCurrentUser() currentUserDto: CurrentUserDto,
-    @Query() query: ListArticlesDto,
+    @Query() query: ListArticlesQueryDto,
   ) {
     return this.articleService.findAll(currentUserDto, query)
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('feed')
+  feed(
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+    @Query() query: FeedQueryDto,
+  ) {
+    return this.articleService.feed(currentUserDto, query)
   }
 
   @UseGuards(AuthGuard)
