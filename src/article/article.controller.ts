@@ -102,6 +102,15 @@ export class ArticleController {
     return this.articleService.getArticle(currentUserDto, slug)
   }
 
+  @UseGuards(OptionalAuthGuard)
+  @Get(':slug/comments')
+  getComment(
+    @Param() { slug }: ParamSlugDto,
+    @GetCurrentUser() currentUserDto: CurrentUserDto,
+  ) {
+    return this.articleService.getCommentsByArticleSlug(currentUserDto, slug)
+  }
+
   @UseGuards(AuthGuard)
   @Post(':slug/comments')
   createComment(

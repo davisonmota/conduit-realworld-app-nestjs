@@ -285,6 +285,11 @@ export class ArticleService {
     return this.commentMap({ comment, following: false })
   }
 
+  async getCommentsByArticleSlug(currentUserDto: CurrentUserDto, slug: string) {
+    const comments = await this.articleRepository.getCommentsByArticleSlug(slug)
+    return this.commentsMap({ comments, currentUser: currentUserDto })
+  }
+
   async deleteComment(currentUserDto: CurrentUserDto, id: string) {
     const comment = await this.commentRepository.findOne({
       where: { id },
@@ -446,5 +451,39 @@ export class ArticleService {
       articles: multipleArticlesDto,
       articlesCount,
     }
+  }
+
+  private async commentsMap({
+    comments,
+    currentUser,
+  }: {
+    comments: Comment[]
+    currentUser: CurrentUserDto
+  }) {
+    const commentsMapped = await Promise.all(
+      comments.map(async (comment) => {
+        let following = false
+        if (currentUser.id) {
+          const { isFollowing } = await this.profileService.isFollowing(
+            currentUser.username,
+            comment.author.username,
+          )
+          following = isFollowing
+        }
+        return {
+          id: comment.id,
+          createdAt: comment.created_at,
+          updatedAt: comment.updated_at,
+          body: comment.body,
+          author: {
+            username: comment.author.username,
+            bio: comment.author.bio,
+            image: comment.author.image,
+            following,
+          },
+        }
+      }),
+    )
+    return { comments: commentsMapped }
   }
 }

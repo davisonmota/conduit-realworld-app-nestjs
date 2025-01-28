@@ -102,4 +102,12 @@ export class ArticleRepository {
       articlesCount,
     }
   }
+
+  async getCommentsByArticleSlug(slug: string) {
+    const article = await this.articlesTypeOrmRepository.findOne({
+      where: { slug },
+      relations: ['comments', 'comments.author'],
+    })
+    return article ? article.comments : []
+  }
 }
