@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm'
 import { BaseEntity } from '../../../common/entities/base.entity'
-import { User } from '../../../user/entities/user.entity'
+import { User } from '../../../customer/user/entities/user.entity'
 import { Tag } from './tag.entity'
 import { Comment } from '../../comment/entities/comment.entity'
 

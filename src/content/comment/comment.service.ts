@@ -8,9 +8,9 @@ import { CreateCommentDto } from './dto/create-comment.dto'
 import { Comment } from './entities/comment.entity'
 import { CommentRepository } from './repositories/comment.repository'
 import { CommentResponse } from './dto/comment-response.dto'
-import { UserRepository } from '../../user/repositories/user.repository'
+import { UserRepository } from '../../customer/user/repositories/user.repository'
 import { ArticleRepository } from '../article/repositories/article.repository'
-import { ProfileService } from '../../profile/profile.service'
+import { ProfileService } from '../../customer/profile/profile.service'
 
 interface CommentMapInput {
   comment: Comment

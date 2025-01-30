@@ -5,9 +5,9 @@ import { ArticleRepository } from './repositories/article.repository'
 import { Article } from './entities/article.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Tag } from './entities/tag.entity'
-import { UserModule } from '../../user/user.module'
-import { ProfileModule } from '../../profile/profile.module'
-import { User } from '../../user/entities/user.entity'
+import { UserModule } from '../../customer/user/user.module'
+import { ProfileModule } from '../../customer/profile/profile.module'
+import { User } from '../../customer/user/entities/user.entity'
 import { TagController } from './tag.controller'
 
 @Module({

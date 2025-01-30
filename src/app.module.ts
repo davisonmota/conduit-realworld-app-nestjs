@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common'
-import { UserModule } from './user/user.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { User } from './user/entities/user.entity'
+import { User } from './customer/user/entities/user.entity'
 import { AuthModule } from './auth/auth.module'
-import { Follow } from './profile/entities/followers.entyty'
-import { ProfileModule } from './profile/profile.module'
-import { ArticleModule } from './content/article/article.module'
+import { Follow } from './customer/profile/entities/followers.entyty'
 import { Article } from './content/article/entities/article.entity'
 import { Tag } from './content/article/entities/tag.entity'
 import { Comment } from './content/comment/entities/comment.entity'
 import { ContentModule } from './content/content.module'
+import { CustomerModule } from './customer/customer.module'
 
 @Module({
   // TODO: move variables to envFile
@@ -25,9 +23,7 @@ import { ContentModule } from './content/content.module'
       synchronize: true,
     }),
     AuthModule,
-    UserModule,
-    ProfileModule,
-    ArticleModule,
+    CustomerModule,
     ContentModule,
   ],
   controllers: [],

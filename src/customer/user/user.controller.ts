@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UserService } from './user.service'
-import { AuthGuard } from '../auth/guards/auth.guard'
+import { AuthGuard } from '../../auth/guards/auth.guard'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { GetCurrentUser } from '../common/decorators/current-user.param.decorator'
-import { CurrentUserDto } from '../common/dto/current-user.dto'
+import { GetCurrentUser } from '../../common/decorators/current-user.param.decorator'
+import { CurrentUserDto } from '../../common/dto/current-user.dto'
 
 @Controller()
 export class UserController {
