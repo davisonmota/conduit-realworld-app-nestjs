@@ -1,8 +1,8 @@
 import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm'
 import { Follow } from '../../profile/entities/followers.entyty'
 import { BaseEntity } from '../../common/entities/base.entity'
-import { Article } from '../../article/entities/article.entity'
-import { Comment } from '../../article/entities/comment.entity'
+import { Article } from '../../content/article/entities/article.entity'
+import { Comment } from '../../content/comment/entities/comment.entity'
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity<User> {

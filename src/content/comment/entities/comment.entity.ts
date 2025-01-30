@@ -1,7 +1,7 @@
-import { BaseEntity } from '../../common/entities/base.entity'
+import { BaseEntity } from '../../../common/entities/base.entity'
 import { Column, Entity, ManyToOne } from 'typeorm'
-import { Article } from './article.entity'
-import { User } from '../../user/entities/user.entity'
+import { Article } from '../../article/entities/article.entity'
+import { User } from '../../../user/entities/user.entity'
 
 @Entity({ name: 'comments' })
 export class Comment extends BaseEntity<Comment> {

@@ -5,19 +5,19 @@ import { ArticleRepository } from './repositories/article.repository'
 import { Article } from './entities/article.entity'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Tag } from './entities/tag.entity'
-import { UserModule } from '../user/user.module'
-import { ProfileModule } from '../profile/profile.module'
-import { User } from '../user/entities/user.entity'
-import { Comment } from './entities/comment.entity'
-import { CommentRepository } from './repositories/comment.repository'
+import { UserModule } from '../../user/user.module'
+import { ProfileModule } from '../../profile/profile.module'
+import { User } from '../../user/entities/user.entity'
+import { TagController } from './tag.controller'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Article, Tag, User, Comment]),
+    TypeOrmModule.forFeature([Article, User, Tag]),
     UserModule,
     ProfileModule,
   ],
-  controllers: [ArticleController],
-  providers: [ArticleService, ArticleRepository, CommentRepository],
+  controllers: [ArticleController, TagController],
+  providers: [ArticleService, ArticleRepository],
+  exports: [ArticleRepository],
 })
 export class ArticleModule {}

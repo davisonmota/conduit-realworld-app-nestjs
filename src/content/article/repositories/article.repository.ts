@@ -2,9 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { FindOneOptions, Repository } from 'typeorm'
 import { Article } from '../entities/article.entity'
 import { Injectable } from '@nestjs/common'
-import { User } from '../../user/entities/user.entity'
+import { User } from '../../../user/entities/user.entity'
 import { ListArticlesQueryDto } from '../dto/list-articles.query.dto'
-import { FeedQueryDto } from '../dto/feed.query.dto'
+import { FeedQueryDto } from '../dto/feed-query.dto'
 
 @Injectable()
 export class ArticleRepository {

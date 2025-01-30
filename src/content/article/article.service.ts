@@ -6,26 +6,22 @@ import {
 } from '@nestjs/common'
 import { CreateArticleDto } from './dto/create-article.dto'
 import { ArticleRepository } from './repositories/article.repository'
-import { UserRepository } from '../user/repositories/user.repository'
+import { UserRepository } from '../../user/repositories/user.repository'
 import { Article } from './entities/article.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Tag } from './entities/tag.entity'
 import { Repository } from 'typeorm'
 import { ArticleResponse } from './dto/article-response.dto'
-import { ProfileService } from '../profile/profile.service'
+import { ProfileService } from '../../profile/profile.service'
 import { randomUUID } from 'node:crypto'
 import { UpdateArticleDto } from './dto/update-article.dto'
-import { CurrentUserDto } from '../common/dto/current-user.dto'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { Comment } from './entities/comment.entity'
-import { CommentRepository } from './repositories/comment.repository'
-import { CommentResponse } from './dto/comment-response.dto'
+import { CurrentUserDto } from '../../common/dto/current-user.dto'
 import { ListArticlesQueryDto } from './dto/list-articles.query.dto'
 import {
   MultipleArticles,
   MultipleArticlesDto,
-} from './dto/multiple.articles.dto'
-import { FeedQueryDto } from './dto/feed.query.dto'
+} from './dto/multiple-articles.dto'
+import { FeedQueryDto } from './dto/feed-query.dto'
 
 interface ArticleMapInput {
   article: Article
@@ -34,18 +30,12 @@ interface ArticleMapInput {
   favoritesCount: number
 }
 
-interface CommentMapInput {
-  comment: Comment
-  following: boolean
-}
-
 @Injectable()
 export class ArticleService {
   constructor(
     private readonly profileService: ProfileService,
     private readonly articleRepository: ArticleRepository,
     private readonly userRepository: UserRepository,
-    private readonly commentRepository: CommentRepository,
     @InjectRepository(Tag)
     private readonly tagTypeOrmRepository: Repository<Tag>,
   ) {}
@@ -231,6 +221,10 @@ export class ArticleService {
     })
   }
 
+  async countFavorites(articleId: string): Promise<number> {
+    return await this.articleRepository.countFavorites(articleId)
+  }
+
   async unfavorite(userId: string, slug: string) {
     const { isFavorited, user } = await this.isFavorited(userId, slug)
     if (!isFavorited) {
@@ -261,54 +255,6 @@ export class ArticleService {
     })
   }
 
-  async addComment(
-    currentUserDto: CurrentUserDto,
-    slug: string,
-    createCommentDto: CreateCommentDto,
-  ) {
-    const author = await this.userRepository.findOne({
-      where: { id: currentUserDto.id },
-    })
-    if (!author) {
-      throw new NotFoundException('User not found')
-    }
-    const article = await this.articleRepository.findOne({ where: { slug } })
-    if (!article) {
-      throw new NotFoundException('Article not found')
-    }
-    const comment = new Comment({
-      body: createCommentDto.comment.body,
-      author,
-      article,
-    })
-    await this.commentRepository.save(comment)
-    return this.commentMap({ comment, following: false })
-  }
-
-  async getCommentsByArticleSlug(currentUserDto: CurrentUserDto, slug: string) {
-    const comments = await this.articleRepository.getCommentsByArticleSlug(slug)
-    return this.commentsMap({ comments, currentUser: currentUserDto })
-  }
-
-  async deleteComment(currentUserDto: CurrentUserDto, id: string) {
-    const comment = await this.commentRepository.findOne({
-      where: { id },
-      relations: ['author'],
-    })
-    if (!comment) {
-      throw new NotFoundException('Comment not found')
-    }
-    if (comment.author.username !== currentUserDto.username) {
-      throw new ForbiddenException()
-    }
-
-    await this.commentRepository.delete(comment.id)
-  }
-
-  async countFavorites(articleId: string): Promise<number> {
-    return await this.articleRepository.countFavorites(articleId)
-  }
-
   private async createTags(tagList: Array<string>) {
     return await Promise.all(
       tagList.map(async (tagName: string) => {
@@ -321,6 +267,17 @@ export class ArticleService {
         return tag
       }),
     )
+  }
+
+  async getTag({ limit = 20, offset = 0 }: { limit: number; offset: number }) {
+    const tags = await this.tagTypeOrmRepository.find({
+      take: limit,
+      skip: offset,
+    })
+
+    return {
+      tags: tags.map((tag) => tag.tag),
+    }
   }
 
   async isFavorited(userId: string, slugArticle: string) {
@@ -383,23 +340,6 @@ export class ArticleService {
     }
   }
 
-  private commentMap({ comment, following }: CommentMapInput): CommentResponse {
-    return {
-      comment: {
-        id: comment.id,
-        createdAt: comment.created_at,
-        updatedAt: comment.updated_at,
-        body: comment.body,
-        author: {
-          username: comment.author.username,
-          bio: comment.author.bio,
-          image: comment.author.image,
-          following,
-        },
-      },
-    }
-  }
-
   private async multipleArticlesMap({
     articles,
     articlesCount,
@@ -451,39 +391,5 @@ export class ArticleService {
       articles: multipleArticlesDto,
       articlesCount,
     }
-  }
-
-  private async commentsMap({
-    comments,
-    currentUser,
-  }: {
-    comments: Comment[]
-    currentUser: CurrentUserDto
-  }) {
-    const commentsMapped = await Promise.all(
-      comments.map(async (comment) => {
-        let following = false
-        if (currentUser.id) {
-          const { isFollowing } = await this.profileService.isFollowing(
-            currentUser.username,
-            comment.author.username,
-          )
-          following = isFollowing
-        }
-        return {
-          id: comment.id,
-          createdAt: comment.created_at,
-          updatedAt: comment.updated_at,
-          body: comment.body,
-          author: {
-            username: comment.author.username,
-            bio: comment.author.bio,
-            image: comment.author.image,
-            following,
-          },
-        }
-      }),
-    )
-    return { comments: commentsMapped }
   }
 }

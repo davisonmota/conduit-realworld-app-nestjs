@@ -5,10 +5,11 @@ import { User } from './user/entities/user.entity'
 import { AuthModule } from './auth/auth.module'
 import { Follow } from './profile/entities/followers.entyty'
 import { ProfileModule } from './profile/profile.module'
-import { ArticleModule } from './article/article.module'
-import { Article } from './article/entities/article.entity'
-import { Tag } from './article/entities/tag.entity'
-import { Comment } from './article/entities/comment.entity'
+import { ArticleModule } from './content/article/article.module'
+import { Article } from './content/article/entities/article.entity'
+import { Tag } from './content/article/entities/tag.entity'
+import { Comment } from './content/comment/entities/comment.entity'
+import { ContentModule } from './content/content.module'
 
 @Module({
   // TODO: move variables to envFile
@@ -27,6 +28,7 @@ import { Comment } from './article/entities/comment.entity'
     UserModule,
     ProfileModule,
     ArticleModule,
+    ContentModule,
   ],
   controllers: [],
   providers: [],

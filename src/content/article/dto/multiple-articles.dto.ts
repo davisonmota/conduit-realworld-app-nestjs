@@ -10,7 +10,7 @@ import {
   ValidateNested,
 } from 'class-validator'
 import { Type } from 'class-transformer'
-import { IsSlug } from '../../common/validators/is-slug.constraint'
+import { IsSlug } from '../../../common/validators/is-slug.constraint'
 
 export class AuthorResponse {
   @IsNotEmpty()

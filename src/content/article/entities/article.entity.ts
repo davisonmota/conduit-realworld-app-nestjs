@@ -6,10 +6,10 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm'
-import { BaseEntity } from '../../common/entities/base.entity'
-import { User } from '../../user/entities/user.entity'
+import { BaseEntity } from '../../../common/entities/base.entity'
+import { User } from '../../../user/entities/user.entity'
 import { Tag } from './tag.entity'
-import { Comment } from './comment.entity'
+import { Comment } from '../../comment/entities/comment.entity'
 
 @Entity({ name: 'articles' })
 export class Article extends BaseEntity<Article> {

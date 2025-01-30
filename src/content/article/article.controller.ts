@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -12,16 +11,15 @@ import {
   ValidationPipe,
 } from '@nestjs/common'
 import { ArticleService } from './article.service'
-import { AuthGuard } from '../auth/guards/auth.guard'
+import { AuthGuard } from '../../auth/guards/auth.guard'
 import { CreateArticleDto } from './dto/create-article.dto'
-import { GetCurrentUser } from '../common/decorators/current-user.param.decorator'
-import { CurrentUserDto } from '../common/dto/current-user.dto'
+import { GetCurrentUser } from '../../common/decorators/current-user.param.decorator'
+import { CurrentUserDto } from '../../common/dto/current-user.dto'
 import { ParamSlugDto } from './dto/param-slug.dto'
 import { UpdateArticleDto } from './dto/update-article.dto'
-import { CreateCommentDto } from './dto/create-comment.dto'
-import { OptionalAuthGuard } from '../auth/guards/optional-auth.guard'
+import { OptionalAuthGuard } from '../../auth/guards/optional-auth.guard'
 import { ListArticlesQueryDto } from './dto/list-articles.query.dto'
-import { FeedQueryDto } from './dto/feed.query.dto'
+import { FeedQueryDto } from './dto/feed-query.dto'
 
 @Controller('articles')
 export class ArticleController {
@@ -100,38 +98,5 @@ export class ArticleController {
     @GetCurrentUser() currentUserDto: CurrentUserDto,
   ) {
     return this.articleService.getArticle(currentUserDto, slug)
-  }
-
-  @UseGuards(OptionalAuthGuard)
-  @Get(':slug/comments')
-  getComment(
-    @Param() { slug }: ParamSlugDto,
-    @GetCurrentUser() currentUserDto: CurrentUserDto,
-  ) {
-    return this.articleService.getCommentsByArticleSlug(currentUserDto, slug)
-  }
-
-  @UseGuards(AuthGuard)
-  @Post(':slug/comments')
-  createComment(
-    @Param() { slug }: ParamSlugDto,
-    @GetCurrentUser() currentUserDto: CurrentUserDto,
-    @Body(new ValidationPipe({ whitelist: true }))
-    createCommentDto: CreateCommentDto,
-  ) {
-    return this.articleService.addComment(
-      currentUserDto,
-      slug,
-      createCommentDto,
-    )
-  }
-
-  @UseGuards(AuthGuard)
-  @Delete('/comments/:id')
-  deleteComment(
-    @Param('id', ParseUUIDPipe) id: string,
-    @GetCurrentUser() currentUserDto: CurrentUserDto,
-  ) {
-    return this.articleService.deleteComment(currentUserDto, id)
   }
 }
