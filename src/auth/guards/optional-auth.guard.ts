@@ -7,10 +7,14 @@ import {
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
 import { CurrentUserDto } from '../../common/dto/current-user.dto'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class OptionalAuthGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest()
@@ -24,9 +28,8 @@ export class OptionalAuthGuard implements CanActivate {
     }
 
     try {
-      // TODO: move secret to env file
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: 'secret',
+        secret: this.configService.get<string>('SECRET_JWT'),
       })
       request['user'] = new CurrentUserDto({
         id: payload.sub,

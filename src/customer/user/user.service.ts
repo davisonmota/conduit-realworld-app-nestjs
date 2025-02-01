@@ -6,12 +6,14 @@ import { User } from './entities/user.entity'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
 import { UserResponseDto } from './dto/user.response.dto'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -29,8 +31,10 @@ export class UserService {
     const user = new User({
       email: createUserDto.user.email,
       username: createUserDto.user.username,
-      //TODO: move salt env to envFile
-      password: await bcrypt.hash(createUserDto.user.password, 10),
+      password: await bcrypt.hash(
+        createUserDto.user.password,
+        this.configService.get<number>('HASH_SALT_JWT'),
+      ),
     })
     const newUser = await this.userRepository.save(user)
     return this.userMap(newUser)

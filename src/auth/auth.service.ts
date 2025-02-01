@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { compare } from 'bcrypt'
 import { UserRepository } from '../customer/user/repositories/user.repository'
+import { ConfigService } from '@nestjs/config'
 
 interface SignInInput {
   email: string
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async sigIn({ email, password }: SignInInput) {
@@ -20,7 +22,6 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid credentials.')
     }
-
     const isMatch = await compare(password, user.password)
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials.')
@@ -29,7 +30,9 @@ export class AuthService {
     const payload = { sub: user.id, username: user.username }
     return {
       user: {
-        token: await this.jwtService.signAsync(payload),
+        token: await this.jwtService.signAsync(payload, {
+          secret: this.configService.get('SECRET_JWT'),
+        }),
         email: user.email,
         username: user.username,
         bio: user.bio,
