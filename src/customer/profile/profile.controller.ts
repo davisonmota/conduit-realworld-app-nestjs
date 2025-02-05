@@ -1,18 +1,18 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Post,
   UseGuards,
   ValidationPipe,
-  Delete,
 } from '@nestjs/common'
-import { UsernameDto } from './dto/username.dto'
-import { ProfileService } from './profile.service'
 import { AuthGuard } from '../../auth/guards/auth.guard'
 import { OptionalAuthGuard } from '../../auth/guards/optional-auth.guard'
 import { GetCurrentUser } from '../../common/decorators/current-user.param.decorator'
 import { CurrentUserDto } from '../../common/dto/current-user.dto'
+import { UsernameDto } from './dto/username.dto'
+import { ProfileService } from './profile.service'
 
 @Controller('profiles')
 export class ProfileController {

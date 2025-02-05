@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer'
 import {
   IsEmail,
   IsNotEmpty,
@@ -6,7 +7,6 @@ import {
   IsUrl,
   ValidateNested,
 } from 'class-validator'
-import { Type } from 'class-transformer'
 
 class UserDto {
   @IsOptional()

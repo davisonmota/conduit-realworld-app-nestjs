@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common'
-import { AuthService } from './auth.service'
-import { AuthController } from './auth.controller'
 import { JwtModule } from '@nestjs/jwt'
-import { UserModule } from '../customer/user/user.module'
 import * as process from 'node:process'
+import { UserModule } from '../customer/user/user.module'
+import { AuthController } from './auth.controller'
+import { AuthService } from './auth.service'
 
 @Module({
   imports: [

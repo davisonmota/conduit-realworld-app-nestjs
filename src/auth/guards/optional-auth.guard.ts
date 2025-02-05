@@ -4,10 +4,10 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
 import { CurrentUserDto } from '../../common/dto/current-user.dto'
-import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class OptionalAuthGuard implements CanActivate {

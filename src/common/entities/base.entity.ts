@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -5,7 +6,6 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { randomUUID } from 'node:crypto'
 
 export abstract class BaseEntity<T> {
   constructor(data: Partial<T>) {

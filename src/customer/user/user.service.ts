@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
+import * as bcryptjs from 'bcryptjs'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { UserRepository } from './repositories/user.repository'
-import { User } from './entities/user.entity'
-import * as bcrypt from 'bcrypt'
-import { JwtService } from '@nestjs/jwt'
 import { UserResponseDto } from './dto/user.response.dto'
-import { ConfigService } from '@nestjs/config'
+import { User } from './entities/user.entity'
+import { UserRepository } from './repositories/user.repository'
 
 @Injectable()
 export class UserService {
@@ -31,7 +31,7 @@ export class UserService {
     const user = new User({
       email: createUserDto.user.email,
       username: createUserDto.user.username,
-      password: await bcrypt.hash(
+      password: await bcryptjs.hash(
         createUserDto.user.password,
         this.configService.get<number>('HASH_SALT_JWT'),
       ),

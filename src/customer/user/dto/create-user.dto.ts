@@ -1,5 +1,5 @@
-import { IsEmail, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
 import { Type } from 'class-transformer'
+import { IsEmail, IsNotEmpty, IsString, ValidateNested } from 'class-validator'
 import { IsSlug } from '../../../common/validators/is-slug.constraint'
 
 class UserDto {

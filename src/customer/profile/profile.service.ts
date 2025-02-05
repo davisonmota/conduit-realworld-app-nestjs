@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { UserRepository } from '../user/repositories/user.repository'
 import { User } from '../user/entities/user.entity'
+import { UserRepository } from '../user/repositories/user.repository'
 import { ProfileResponseDto } from './dto/profile.response.dto'
 import { FollowRepository } from './repositories/follow.repository'
 

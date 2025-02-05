@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
-import { compare } from 'bcrypt'
-import { UserRepository } from '../customer/user/repositories/user.repository'
 import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
+import { compare } from 'bcryptjs'
+import { UserRepository } from '../customer/user/repositories/user.repository'
 
 interface SignInInput {
   email: string

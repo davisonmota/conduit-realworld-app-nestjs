@@ -8,8 +8,8 @@ import {
 } from 'typeorm'
 import { BaseEntity } from '../../../common/entities/base.entity'
 import { User } from '../../../customer/user/entities/user.entity'
-import { Tag } from './tag.entity'
 import { Comment } from '../../comment/entities/comment.entity'
+import { Tag } from './tag.entity'
 
 @Entity({ name: 'articles' })
 export class Article extends BaseEntity<Article> {

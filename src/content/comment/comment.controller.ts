@@ -9,12 +9,12 @@ import {
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common'
-import { CommentService } from './comment.service'
+import { AuthGuard } from '../../auth/guards/auth.guard'
 import { OptionalAuthGuard } from '../../auth/guards/optional-auth.guard'
-import { ParamSlugDto } from '../article/dto/param-slug.dto'
 import { GetCurrentUser } from '../../common/decorators/current-user.param.decorator'
 import { CurrentUserDto } from '../../common/dto/current-user.dto'
-import { AuthGuard } from '../../auth/guards/auth.guard'
+import { ParamSlugDto } from '../article/dto/param-slug.dto'
+import { CommentService } from './comment.service'
 import { CreateCommentDto } from './dto/create-comment.dto'
 
 @Controller()
