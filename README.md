@@ -63,16 +63,16 @@ Certifique-se de ter instalado:
 
 2. Instale as dependências:
 ```sh
- npm install
+  pnpm install
 ```
 
 3. Crie um arquivo `.env` copiando o arquivo `.env.example` na raiz do projeto:
 ```sh
-    cp .env.example .env
+  cp .env.example .env
 ```
 4. Inicie o servidor:
 ```sh
- npm run start:dev
+  pnpm run start:dev
 ```
 
 A API estará rodando em `http://localhost:3000/`
