@@ -70,7 +70,11 @@ Certifique-se de ter instalado:
 ```sh
   cp .env.example .env
 ```
-4. Inicie o servidor:
+4. (Opicional) Rodar banco de dados PostgreSQL via docker:
+```sh
+  docker compose up 
+```
+5. Inicie o servidor:
 ```sh
   pnpm run start:dev
 ```
