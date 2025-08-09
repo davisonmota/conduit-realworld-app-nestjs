@@ -57,8 +57,8 @@ Certifique-se de ter instalado:
 
 1. Clone o repositório:
 ```sh
-https://github.com/davisonmota/conduit-realworld-app-nestjs.git
-cd conduit-realworld-app-nestjs
+  https://github.com/davisonmota/conduit-realworld-app-nestjs.git
+  cd conduit-realworld-app-nestjs
 ```
 
 2. Instale as dependências:
