@@ -68,7 +68,9 @@ export class UserService {
   private userMap(user: User): UserResponseDto {
     return {
       user: {
-        token: this.jwtService.sign({ sub: user.id, username: user.username }),
+        token: this.jwtService.sign({ sub: user.id, username: user.username }, {
+          secret: this.configService.get('SECRET_JWT'),
+        }),
         email: user.email,
         username: user.username,
         bio: user.bio,
