@@ -6,8 +6,8 @@ export const GetCurrentUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest()
     const user = request['user']
     return new CurrentUserDto({
-      id: user.id,
-      username: user.username,
+      id: user?.id ?? null,
+      username: user?.username ?? null,
     })
   },
 )
